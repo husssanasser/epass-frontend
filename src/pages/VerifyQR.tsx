@@ -8,12 +8,12 @@ const VerifyQR = () => {
   const [result, setResult] = useState<any>(null);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    const t = searchParams.get('token');
-    if (t) {
-      verifyToken(t);
-    }
-  }, []);
+ useEffect(() => {
+  const t = searchParams.get('token');
+  if (t) {
+    verifyToken(t);
+  }
+}, [searchParams]);
 
   const verifyToken = async (t: string) => {
     setLoading(true);
