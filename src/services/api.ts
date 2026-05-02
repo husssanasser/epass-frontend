@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:8080/api',
+  baseURL: process.env.REACT_APP_API_URL || 'http://localhost:8080/api',
 });
 
 api.interceptors.request.use((config) => {
@@ -35,21 +35,29 @@ export const permitAPI = {
 };
 
 export const adminAPI = {
-  getAllRequests: () =>
-    api.get('/admin/requests'),
-  getPendingRequests: () =>
-    api.get('/admin/requests/pending'),
-  approveRequest: (id: number) =>
-    api.put(`/admin/requests/${id}/approve`),
-  rejectRequest: (id: number) =>
-    api.put(`/admin/requests/${id}/reject`),
-  verifyQR: (token: string) =>
-    api.get(`/admin/verify/${token}`),
+    getAllRequests: () =>
+        api.get('/admin/requests'),
+    getPendingRequests: () =>
+        api.get('/admin/requests/pending'),
+    approveRequest: (id: number) =>
+        api.put(`/admin/requests/${id}/approve`),
+    rejectRequest: (id: number) =>
+        api.put(`/admin/requests/${id}/reject`),
+    verifyQR: (token: string) =>
+        api.get(`/verify/${token}`),
 };
 
 export const chatAPI = {
   sendMessage: (message: string) =>
     api.post('/chatbot/message', { message }),
 };
-
+export const uploadAPI = {
+  uploadFile: (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return api.post('/upload', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+  }
+};
 export default api;

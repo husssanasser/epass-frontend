@@ -68,15 +68,16 @@ const Register = () => {
           />
         </div>
 
-        <div style={styles.inputGroup}>
-          <label style={styles.label}>Date of Birth</label>
-          <input
-            style={styles.input}
-            type="date"
-            value={dateOfBirth}
-            onChange={e => setDateOfBirth(e.target.value)}
-          />
-        </div>
+       <div style={styles.inputGroup}>
+  <label style={styles.label}>Date of Birth (YYYY-MM-DD)</label>
+  <input
+    style={styles.input}
+    type="text"
+    placeholder="e.g. 1999-05-15"
+    value={dateOfBirth}
+    onChange={e => setDateOfBirth(e.target.value)}
+  />
+</div>
 
         <button
           style={styles.button}
