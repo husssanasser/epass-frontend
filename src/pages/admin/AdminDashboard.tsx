@@ -31,30 +31,27 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleApprove = async (id: number) => {
+const handleApprove = async (id: number) => {
     setActionLoading(id);
     try {
       await adminAPI.approveRequest(id);
-      await fetchRequests();
     } catch (err) {
-      alert('Error approving permit');
-    } finally {
-      setActionLoading(null);
+      // ignore
     }
+    await fetchRequests();
+    setActionLoading(null);
   };
 
   const handleReject = async (id: number) => {
     setActionLoading(id);
     try {
       await adminAPI.rejectRequest(id);
-      await fetchRequests();
     } catch (err) {
-      alert('Error rejecting permit');
-    } finally {
-      setActionLoading(null);
+      // ignore
     }
+    await fetchRequests();
+    setActionLoading(null);
   };
-
   const filtered = requests
     .filter(r => r.status === activeTab)
     .filter(r =>
