@@ -11,6 +11,7 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [activeTab, setActiveTab] = useState<Tab>('PENDING');
+  const [actionLoading, setActionLoading] = useState<number | null>(null);
   const { logout } = useAuth();
   const navigate = useNavigate();
 
@@ -19,6 +20,7 @@ const AdminDashboard = () => {
   }, []);
 
   const fetchRequests = async () => {
+    setLoading(true);
     try {
       const res = await adminAPI.getAllRequests();
       setRequests(res.data);
@@ -30,22 +32,26 @@ const AdminDashboard = () => {
   };
 
   const handleApprove = async (id: number) => {
+    setActionLoading(id);
     try {
       await adminAPI.approveRequest(id);
-      fetchRequests();
-      alert('Permit Approved Successfully!');
+      await fetchRequests();
     } catch (err) {
       alert('Error approving permit');
+    } finally {
+      setActionLoading(null);
     }
   };
 
   const handleReject = async (id: number) => {
+    setActionLoading(id);
     try {
       await adminAPI.rejectRequest(id);
-      fetchRequests();
-      alert('Permit Rejected');
+      await fetchRequests();
     } catch (err) {
       alert('Error rejecting permit');
+    } finally {
+      setActionLoading(null);
     }
   };
 
@@ -64,12 +70,19 @@ const AdminDashboard = () => {
     return '#ffc107';
   };
 
+  const openAttachment = (url: string) => {
+    if (url.startsWith('http://localhost')) {
+      alert('This file was uploaded locally and cannot be viewed on the deployed version. Please re-upload.');
+      return;
+    }
+    window.open(url, '_blank');
+  };
+
   return (
     <div style={styles.container}>
       <div style={styles.sidebar}>
         <h2 style={styles.logo}>E-PASS</h2>
         <button style={styles.sideBtn} onClick={() => navigate('/admin/dashboard')}>Admin Review</button>
-        <button style={styles.sideBtn} onClick={() => navigate('/verify')}>QR Verify</button>
         <button style={styles.logoutBtn} onClick={() => { logout(); navigate('/login'); }}>Logout</button>
       </div>
 
@@ -131,7 +144,7 @@ const AdminDashboard = () => {
                     <td style={styles.td}>{req.submittedAt?.split('T')[0]}</td>
                     <td style={styles.td}>
                       {req.documentUrl
-                        ? <a href={req.documentUrl} target="_blank" rel="noreferrer" style={styles.attachmentLink}>View File</a>
+                        ? <button onClick={() => openAttachment(req.documentUrl!)} style={styles.attachmentBtn}>View File</button>
                         : <span style={{ color: '#999', fontSize: '12px' }}>No attachment</span>
                       }
                     </td>
@@ -142,8 +155,20 @@ const AdminDashboard = () => {
                     </td>
                     {activeTab === 'PENDING' && (
                       <td style={styles.td}>
-                        <button style={styles.approveBtn} onClick={() => handleApprove(req.id)}>Approve</button>
-                        <button style={styles.rejectBtn} onClick={() => handleReject(req.id)}>Reject</button>
+                        <button
+                          style={styles.approveBtn}
+                          onClick={() => handleApprove(req.id)}
+                          disabled={actionLoading === req.id}
+                        >
+                          {actionLoading === req.id ? '...' : 'Approve'}
+                        </button>
+                        <button
+                          style={styles.rejectBtn}
+                          onClick={() => handleReject(req.id)}
+                          disabled={actionLoading === req.id}
+                        >
+                          {actionLoading === req.id ? '...' : 'Reject'}
+                        </button>
                       </td>
                     )}
                   </tr>
@@ -205,9 +230,9 @@ const styles: { [key: string]: React.CSSProperties } = {
     padding: '6px 12px', backgroundColor: '#dc3545', color: 'white',
     border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '12px'
   },
-  attachmentLink: {
-    color: '#003580', fontWeight: 'bold',
-    fontSize: '12px', textDecoration: 'underline'
+  attachmentBtn: {
+    padding: '4px 10px', backgroundColor: '#003580', color: 'white',
+    border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '12px'
   },
 };
 
