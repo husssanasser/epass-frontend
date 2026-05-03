@@ -11,6 +11,18 @@ const Register = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  const formatDate = (value: string, prev: string) => {
+    const isDeleting = value.length < prev.length;
+    if (isDeleting) return value.replace(/-$/, '');
+    let val = value.replace(/\D/g, '');
+    if (val.length >= 6) {
+      val = val.slice(0, 4) + '-' + val.slice(4, 6) + '-' + val.slice(6, 8);
+    } else if (val.length >= 4) {
+      val = val.slice(0, 4) + '-' + val.slice(4);
+    }
+    return val.slice(0, 10);
+  };
+
   const isValidEmail = (email: string) => {
     const allowedDomains = ['gmail.com', 'hotmail.com', 'outlook.com', 'yahoo.com', 'icloud.com'];
     const domain = email.split('@')[1]?.toLowerCase();
@@ -52,44 +64,31 @@ const Register = () => {
 
         <div style={styles.inputGroup}>
           <label style={styles.label}>Full Name</label>
-          <input
-            style={styles.input}
-            placeholder="Enter Name"
-            value={fullName}
-            onChange={e => setFullName(e.target.value)}
-          />
+          <input style={styles.input} placeholder="Enter Name"
+            value={fullName} onChange={e => setFullName(e.target.value)} />
         </div>
 
         <div style={styles.inputGroup}>
           <label style={styles.label}>Email</label>
-          <input
-            style={styles.input}
-            type="email"
-            placeholder="ex: name@gmail.com"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-          />
+          <input style={styles.input} type="email" placeholder="ex: name@gmail.com"
+            value={email} onChange={e => setEmail(e.target.value)} />
         </div>
 
         <div style={styles.inputGroup}>
           <label style={styles.label}>Password</label>
-          <input
-            style={styles.input}
-            type="password"
-            placeholder="At least 6 characters"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-          />
+          <input style={styles.input} type="password" placeholder="At least 6 characters"
+            value={password} onChange={e => setPassword(e.target.value)} />
         </div>
 
         <div style={styles.inputGroup}>
-          <label style={styles.label}>Date of Birth (YYYY-MM-DD)</label>
+          <label style={styles.label}>Date of Birth</label>
           <input
             style={styles.input}
             type="text"
-            placeholder="e.g. 1999-05-15"
+            placeholder="YYYY-MM-DD"
             value={dateOfBirth}
-            onChange={e => setDateOfBirth(e.target.value)}
+            maxLength={10}
+            onChange={e => setDateOfBirth(formatDate(e.target.value, dateOfBirth))}
           />
         </div>
 
@@ -107,20 +106,8 @@ const Register = () => {
 };
 
 const styles: { [key: string]: React.CSSProperties } = {
-  container: {
-    minHeight: '100vh',
-    backgroundColor: '#003580',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  card: {
-    backgroundColor: 'white',
-    borderRadius: '12px',
-    padding: '40px',
-    width: '400px',
-    boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
-  },
+  container: { minHeight: '100vh', backgroundColor: '#003580', display: 'flex', alignItems: 'center', justifyContent: 'center' },
+  card: { backgroundColor: 'white', borderRadius: '12px', padding: '40px', width: '400px', boxShadow: '0 4px 20px rgba(0,0,0,0.3)' },
   header: { textAlign: 'center', marginBottom: '24px' },
   title: { color: '#003580', fontSize: '28px', fontWeight: 'bold', margin: 0 },
   subtitle: { color: '#666', fontSize: '14px', margin: '4px 0 0 0' },
